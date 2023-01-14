@@ -16,7 +16,7 @@ SwiftFFmpeg primarily uses [SwiftPM](https://swift.org/package-manager/) as its 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/sunlubo/SwiftFFmpeg.git", from: "1.0.0")
+    .package(url: "https://github.com/tylerjonesio/SwiftFFmpeg.git", from: "5.1.2")
 ]
 ```
 
