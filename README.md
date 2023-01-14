@@ -4,13 +4,11 @@ A Swift wrapper for the FFmpeg API.
 
 > Note: SwiftFFmpeg is still in development, and the API is not guaranteed to be stable. It's subject to change without warning.
 
-## Installation
+## FFmpeg Sources
 
-You should install [FFmpeg](http://ffmpeg.org/) (Requires FFmpeg 4.0 or higher) before use this library, on macOS, you can:
+This fork relies on a multiplatform (iOS, macOS, & tvOS) prebuilt FFmpeg xcframework binary from the [FFmpegKit SPM repo](https://github.com/tylerjonesio/ffmpeg-kit-spm). The linked binaries do not include any GPL sources and are LGPL compatible. 
 
-```bash
-brew install ffmpeg
-```
+If you'd like to use your own FFmpeg binaries, check out the [upstream repository](https://github.com/sunlubo/SwiftFFmpeg) for instructions.
 
 ### Swift Package Manager
 
@@ -26,65 +24,18 @@ dependencies: [
 
 - [API documentation](https://sunlubo.github.io/SwiftFFmpeg)
 
-## Usage
+## Examples
 
-```swift
-import Foundation
-import SwiftFFmpeg
+For specific examples such as decoding, encoding, scaling, etc, check out the [SwiftFFmpegExamples project](Sources/SwiftFFmpegExamples/) in this package.
 
-if CommandLine.argc < 2 {
-    print("Usage: \(CommandLine.arguments[0]) <input file>")
-    exit(1)
-}
-let input = CommandLine.arguments[1]
-
-let fmtCtx = try AVFormatContext(url: input)
-try fmtCtx.findStreamInfo()
-
-fmtCtx.dumpFormat(isOutput: false)
-
-guard let stream = fmtCtx.videoStream else {
-    fatalError("No video stream.")
-}
-guard let codec = AVCodec.findDecoderById(stream.codecParameters.codecId) else {
-    fatalError("Codec not found.")
-}
-let codecCtx = AVCodecContext(codec: codec)
-codecCtx.setParameters(stream.codecParameters)
-try codecCtx.openCodec()
-
-let pkt = AVPacket()
-let frame = AVFrame()
-
-while let _ = try? fmtCtx.readFrame(into: pkt) {
-    defer { pkt.unref() }
-
-    if pkt.streamIndex != stream.index {
-        continue
-    }
-
-    try codecCtx.sendPacket(pkt)
-
-    while true {
-        do {
-            try codecCtx.receiveFrame(frame)
-        } catch let err as AVError where err == .tryAgain || err == .eof {
-            break
-        }
-
-        let str = String(
-            format: "Frame %3d (type=%@, size=%5d bytes) pts %4lld key_frame %d",
-            codecCtx.frameNumber,
-            frame.pictureType.description,
-            frame.pktSize,
-            frame.pts,
-            frame.isKeyFrame
-        )
-        print(str)
-
-        frame.unref()
-    }
-}
-
-print("Done.")
-```
+#### 
+* [Video Decoding](Sources/SwiftFFmpegExamples/decode_video.swift)
+* [Audio Decoding](Sources/SwiftFFmpegExamples/decode_audio.swift)
+* [Video Encoding](Sources/SwiftFFmpegExamples/encode_video.swift)
+* [Audio Encoding](Sources/SwiftFFmpegExamples/encode_audio.swift)
+* [Demuxing/Decoding](Sources/SwiftFFmpegExamples/demuxing_decoding.swift)
+* [Remuxing](Sources/SwiftFFmpegExamples/remuxing.swift)
+* [Hardware Decoding](Sources/SwiftFFmpegExamples/hw_decode.swift)
+* [Scaling Video](Sources/SwiftFFmpegExamples/scaling_video.swift)
+* [Filtering Video](Sources/SwiftFFmpegExamples/filtering_video.swift)
+* [Filtering Audio](Sources/SwiftFFmpegExamples/filtering_audio.swift)

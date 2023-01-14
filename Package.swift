@@ -29,7 +29,7 @@ let package = Package(
     ),
     .executableTarget(
       name: "SwiftFFmpegExamples",
-      dependencies: ["SwiftFFmpeg"]
+      dependencies: [.target(name: "SwiftFFmpeg")]
     ),
     .testTarget(
       name: "SwiftFFmpegTests",
