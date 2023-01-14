@@ -18,63 +18,63 @@ import CFFmpeg
 
 public struct AVChannel: Equatable {
   /// FL
-  public static let frontLeft = AVChannel(rawValue: UInt64(AV_CH_FRONT_LEFT))
+  public static let frontLeft = AVChannel(rawValue: AV_CHAN_FRONT_LEFT.rawValue)
   /// FR
-  public static let frontRight = AVChannel(rawValue: UInt64(AV_CH_FRONT_RIGHT))
+  public static let frontRight = AVChannel(rawValue: AV_CHAN_FRONT_RIGHT.rawValue)
   /// FC
-  public static let frontCenter = AVChannel(rawValue: UInt64(AV_CH_FRONT_CENTER))
+  public static let frontCenter = AVChannel(rawValue: AV_CHAN_FRONT_CENTER.rawValue)
   /// LFE
-  public static let lowFrequency = AVChannel(rawValue: UInt64(AV_CH_LOW_FREQUENCY))
+  public static let lowFrequency = AVChannel(rawValue: AV_CHAN_LOW_FREQUENCY.rawValue)
   /// BL
-  public static let backLeft = AVChannel(rawValue: UInt64(AV_CH_BACK_LEFT))
+  public static let backLeft = AVChannel(rawValue: AV_CHAN_BACK_LEFT.rawValue)
   /// BR
-  public static let backRight = AVChannel(rawValue: UInt64(AV_CH_BACK_RIGHT))
+  public static let backRight = AVChannel(rawValue: AV_CHAN_BACK_RIGHT.rawValue)
   /// FLC
-  public static let frontLeftOfCenter = AVChannel(rawValue: UInt64(AV_CH_FRONT_LEFT_OF_CENTER))
+  public static let frontLeftOfCenter = AVChannel(rawValue: AV_CHAN_FRONT_LEFT_OF_CENTER.rawValue)
   /// FRC
-  public static let frontRightOfCenter = AVChannel(rawValue: UInt64(AV_CH_FRONT_RIGHT_OF_CENTER))
+  public static let frontRightOfCenter = AVChannel(rawValue: AV_CHAN_FRONT_RIGHT_OF_CENTER.rawValue)
   /// BC
-  public static let backCenter = AVChannel(rawValue: UInt64(AV_CH_BACK_CENTER))
+  public static let backCenter = AVChannel(rawValue: AV_CHAN_BACK_CENTER.rawValue)
   /// SL
-  public static let sideLeft = AVChannel(rawValue: UInt64(AV_CH_SIDE_LEFT))
+  public static let sideLeft = AVChannel(rawValue: AV_CHAN_SIDE_LEFT.rawValue)
   /// SR
-  public static let sideRight = AVChannel(rawValue: UInt64(AV_CH_SIDE_RIGHT))
+  public static let sideRight = AVChannel(rawValue: AV_CHAN_SIDE_RIGHT.rawValue)
   /// TC
-  public static let topCenter = AVChannel(rawValue: UInt64(AV_CH_TOP_CENTER))
+  public static let topCenter = AVChannel(rawValue: AV_CHAN_TOP_CENTER.rawValue)
   /// TFL
-  public static let topFrontLeft = AVChannel(rawValue: UInt64(AV_CH_TOP_FRONT_LEFT))
+  public static let topFrontLeft = AVChannel(rawValue: AV_CHAN_TOP_FRONT_LEFT.rawValue)
   /// TFC
-  public static let topFrontCenter = AVChannel(rawValue: UInt64(AV_CH_TOP_FRONT_CENTER))
+  public static let topFrontCenter = AVChannel(rawValue: AV_CHAN_TOP_FRONT_CENTER.rawValue)
   /// TFR
-  public static let topFrontRight = AVChannel(rawValue: UInt64(AV_CH_TOP_FRONT_RIGHT))
+  public static let topFrontRight = AVChannel(rawValue: AV_CHAN_TOP_FRONT_RIGHT.rawValue)
   /// TBL
-  public static let topBackLeft = AVChannel(rawValue: UInt64(AV_CH_TOP_BACK_LEFT))
+  public static let topBackLeft = AVChannel(rawValue: AV_CHAN_TOP_BACK_LEFT.rawValue)
   /// TBC
-  public static let topBackCenter = AVChannel(rawValue: UInt64(AV_CH_TOP_BACK_CENTER))
+  public static let topBackCenter = AVChannel(rawValue: AV_CHAN_TOP_BACK_CENTER.rawValue)
   /// TBR
-  public static let topBackRight = AVChannel(rawValue: UInt64(AV_CH_TOP_BACK_RIGHT))
+  public static let topBackRight = AVChannel(rawValue: AV_CHAN_TOP_BACK_RIGHT.rawValue)
   /// DL
   ///
   /// Stereo downmix.
-  public static let stereoLeft = AVChannel(rawValue: UInt64(AV_CH_STEREO_LEFT))
+  public static let stereoLeft = AVChannel(rawValue: AV_CHAN_STEREO_LEFT.rawValue)
   /// DR
   ///
   /// See `stereoLeft`.
-  public static let stereoRight = AVChannel(rawValue: UInt64(AV_CH_STEREO_RIGHT))
+  public static let stereoRight = AVChannel(rawValue: AV_CHAN_STEREO_RIGHT.rawValue)
   /// WL
-  public static let wideLeft = AVChannel(rawValue: AV_CH_WIDE_LEFT)
+  public static let wideLeft = AVChannel(rawValue: AV_CHAN_WIDE_LEFT.rawValue)
   /// WR
-  public static let wideRight = AVChannel(rawValue: AV_CH_WIDE_RIGHT)
+  public static let wideRight = AVChannel(rawValue: AV_CHAN_WIDE_RIGHT.rawValue)
   /// SDL
-  public static let surroundDirectLeft = AVChannel(rawValue: AV_CH_SURROUND_DIRECT_LEFT)
+  public static let surroundDirectLeft = AVChannel(rawValue: AV_CHAN_SURROUND_DIRECT_LEFT.rawValue)
   /// SDR
-  public static let surroundDirectRight = AVChannel(rawValue: AV_CH_SURROUND_DIRECT_RIGHT)
+  public static let surroundDirectRight = AVChannel(rawValue: AV_CHAN_SURROUND_DIRECT_RIGHT.rawValue)
   /// LFE2
-  public static let lowFrequency2 = AVChannel(rawValue: AV_CH_LOW_FREQUENCY_2)
+  public static let lowFrequency2 = AVChannel(rawValue: AV_CHAN_LOW_FREQUENCY_2.rawValue)
 
   public let rawValue: UInt64
 
-  public init(rawValue: UInt64) { self.rawValue = rawValue }
+  public init(rawValue: Int32) { self.rawValue = UInt64(rawValue) }
 
   /// The name of the audio channel.
   public var name: String {
@@ -194,7 +194,7 @@ public struct AVChannelLayout: Equatable {
   }
 
   public func channel(at index: Int32) -> AVChannel {
-    AVChannel(rawValue: av_channel_layout_extract_channel(rawValue, index))
+    AVChannel(rawValue: Int32(av_channel_layout_extract_channel(rawValue, index)))
   }
 
   /// Get the default channel layout for a given number of channels.

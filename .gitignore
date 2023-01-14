@@ -70,3 +70,4 @@ SwiftFFmpeg.xcodeproj/
 docs/
 scripts/*
 !scripts/*.sh
+.swiftpm/
