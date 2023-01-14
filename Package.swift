@@ -14,7 +14,7 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/tylerjonesio/ffmpeg-kit-spm", branch: "main")
+    .package(url: "https://github.com/tylerjonesio/ffmpeg-kit-spm", .upToNextMajor(from: "5.1.2"))
   ],
   targets: [
     .target(
