@@ -6,10 +6,14 @@
 //
 
 import CFFmpeg
+import Foundation
 
 // MARK: - AVLog
 
 public enum AVLog {
+    
+  public typealias Callback = ((AVLog.Level, String) -> Void)
+    
   /// Get/set the log level.
   public static var level: Level {
     get { Level(rawValue: av_log_get_level()) }
@@ -32,6 +36,11 @@ public enum AVLog {
     context.withUnsafeObjectPointer { ptr in
       swift_log(ptr, level.rawValue, "\(message)\n")
     }
+  }
+    
+  public static func setLogger(completion: @escaping Callback) {
+    callback = completion
+    av_log_set_callback(avLog(_:_:_:_:))
   }
 }
 
@@ -67,4 +76,17 @@ extension AVLog {
 
     public init(rawValue: Int32) { self.rawValue = rawValue }
   }
+}
+
+private var callback: AVLog.Callback?
+private func avLog(_ item: UnsafeMutableRawPointer?, _ level: Int32, _ message: UnsafePointer<CChar>?, _ listPointer: CVaListPointer?) {
+    let level = AVLog.Level(rawValue: level)
+    
+    let stringMessage = message.flatMap { String(cString: $0) }
+    guard let stringMessage else { return }
+    
+    let formattedString = listPointer.flatMap { NSString(format: stringMessage, arguments: $0) }
+    guard let formattedString else { return }
+    
+    callback?(level, String(formattedString))
 }
