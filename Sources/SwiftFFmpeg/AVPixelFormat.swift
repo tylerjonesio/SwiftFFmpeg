@@ -6,11 +6,10 @@
 //
 
 import CFFmpeg
-@_exported import struct CFFmpeg.AVPixelFormat
 
 // MARK: - AVPixelFormat
 
-//public typealias AVPixelFormat = CFFmpeg.AVPixelFormat
+public typealias AVPixelFormat = CFFmpeg.AVPixelFormat
 
 extension AVPixelFormat {
   public static let none = AV_PIX_FMT_NONE
