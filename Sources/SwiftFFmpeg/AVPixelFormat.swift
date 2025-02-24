@@ -6,10 +6,11 @@
 //
 
 import CFFmpeg
+@_exported import struct CFFmpeg.AVPixelFormat
 
 // MARK: - AVPixelFormat
 
-public typealias AVPixelFormat = CFFmpeg.AVPixelFormat
+//public typealias AVPixelFormat = CFFmpeg.AVPixelFormat
 
 extension AVPixelFormat {
   public static let none = AV_PIX_FMT_NONE
@@ -351,9 +352,6 @@ extension AVPixelFormat {
   public static let BAYER_GRBG16LE = AV_PIX_FMT_BAYER_GRBG16LE
   /// bayer, GRGR..(odd line), BGBG..(even line), 16-bit samples, big-endian */
   public static let BAYER_GRBG16BE = AV_PIX_FMT_BAYER_GRBG16BE
-
-  /// XVideo Motion Acceleration via common packet passing
-  public static let XVMC = AV_PIX_FMT_XVMC
 
   /// planar YUV 4:4:0,20bpp, (1 Cr & Cb sample per 1x2 Y samples), little-endian
   public static let YUV440P10LE = AV_PIX_FMT_YUV440P10LE

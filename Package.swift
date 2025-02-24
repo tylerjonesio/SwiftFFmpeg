@@ -1,11 +1,11 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.10
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
   name: "SwiftFFmpeg",
-  platforms: [.macOS(.v10_15), .iOS(.v12), .tvOS(.v11)],
+  platforms: [.macOS(.v10_15), .iOS(.v12), .tvOS(.v12)],
   products: [
     .library(
       name: "SwiftFFmpeg",
@@ -14,13 +14,13 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/tylerjonesio/ffmpeg-kit-spm", branch: "min.v5.1.2.6")
+    .package(url: "https://github.com/tylerjonesio/ffmpeg-libav-spm", branch: "min.v7.1.2")
   ],
   targets: [
     .target(
         name: "CFFmpeg",
         dependencies: [
-            .product(name: "FFmpeg", package: "ffmpeg-kit-spm")
+            .product(name: "FFmpeg", package: "ffmpeg-libav-spm")
         ]
     ),
     .target(
@@ -28,11 +28,11 @@ let package = Package(
       dependencies: ["CFFmpeg"]
     ),
     .executableTarget(
-      name: "SwiftFFmpegExamples",
-      dependencies: [.target(name: "SwiftFFmpeg")]
+      name: "Examples",
+      dependencies: ["SwiftFFmpeg"]
     ),
     .testTarget(
-      name: "SwiftFFmpegTests",
+      name: "Tests",
       dependencies: ["SwiftFFmpeg"]
     ),
   ]

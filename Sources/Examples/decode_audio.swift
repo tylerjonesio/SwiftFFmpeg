@@ -1,6 +1,6 @@
 //
 //  decode_audio.swift
-//  SwiftFFmpegExamples
+//  Examples
 //
 //  Created by sunlubo on 2019/1/9.
 //
@@ -30,7 +30,7 @@ private func decode(
 
     let dataSize = codecCtx.sampleFormat.bytesPerSample
     for i in 0..<frame.sampleCount {
-      for j in 0..<codecCtx.channelCount {
+        for j in 0..<codecCtx.channelLayout.channelCount {
         fwrite(frame.data[j]!.advanced(by: dataSize * i), 1, dataSize, file)
       }
     }

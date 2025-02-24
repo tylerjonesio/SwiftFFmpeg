@@ -1,6 +1,6 @@
 //
 //  main.swift
-//  SwiftFFmpegExamples
+//  Examples
 //
 //  Created by sunlubo on 2019/1/9.
 //
@@ -14,8 +14,6 @@ if CommandLine.argc < 2 {
     USAGE: \(CommandLine.arguments[0]) subcommand
 
     SUBCOMMANDS:
-      avio_dir_cmd        API example program to show how to manipulate resources accessed through AVIOContext.
-      avio_reading        API example program to show how to read from a custom buffer accessed through AVIOContext.
       decode_video        video decoding with libavcodec API example
       decode_audio        audio decoding with libavcodec API example
       demuxing_decoding   API example program to show how to read frames from an input file.
@@ -39,7 +37,6 @@ if CommandLine.argc < 2 {
       resampling_audio    API example program to show how to resample an audio stream with libswresample.
                           This program generates a series of audio frames, resamples them to a specified
                           output format and rate and saves them to an output file named output_file.
-     device_list          API example for libavdevice.
      bsf                  API example about how to use bitstream filter.
      split_stream         API example about how to split stream from a container format.
     """)
@@ -48,10 +45,6 @@ if CommandLine.argc < 2 {
 
 let subcommand = CommandLine.arguments[1]
 switch subcommand {
-case "avio_dir_cmd":
-  try avio_dir_cmd()
-case "avio_reading":
-  try avio_reading()
 case "decode_video":
   try decode_video()
 case "decode_audio":
@@ -80,8 +73,6 @@ case "scaling_video":
   try scaling_video()
 case "resampling_audio":
   try resampling_audio()
-case "device_list":
-  try device_list()
 case "bsf":
   try bsf()
 case "split_stream":

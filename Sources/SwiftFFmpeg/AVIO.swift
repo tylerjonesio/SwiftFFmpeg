@@ -7,247 +7,6 @@
 
 import CFFmpeg
 
-// MARK: - AVIO
-
-public enum AVIO {
-  /// Allocate a memory block with alignment suitable for all memory accesses
-  /// (including vectors if available on the CPU).
-  ///
-  /// - Parameter size: Size in bytes for the memory block to be allocated
-  /// - Returns: Pointer to the allocated block, or `nil` if the block cannot be allocated.
-  public static func malloc(size: Int) -> UnsafeMutableRawPointer? {
-    av_malloc(size)
-  }
-
-  /// Allocate a memory block with alignment suitable for all memory accesses
-  /// (including vectors if available on the CPU) and zero all the bytes of the block.
-  ///
-  /// - Parameter size: Size in bytes for the memory block to be allocated
-  /// - Returns: Pointer to the allocated block, or `nil` if the block cannot be allocated.
-  public static func mallocz(size: Int) -> UnsafeMutableRawPointer? {
-    av_mallocz(size)
-  }
-
-  /// Allocate, reallocate, or free a block of memory.
-  ///
-  /// If `ptr` is `nil` and `size` > 0, allocate a new block. If `size` is zero,
-  /// free the memory block pointed to by `ptr`. Otherwise, expand or shrink that
-  /// block of memory according to `size`.
-  ///
-  /// - Warning: Unlike `malloc(size:)`, the returned pointer is not guaranteed to be correctly aligned.
-  ///
-  /// - Parameters:
-  ///   - ptr: Pointer to a memory block already allocated with `realloc(_:size:)` or `nil`
-  ///   - size: Size in bytes of the memory block to be allocated or reallocated
-  /// - Returns: Pointer to a newly-reallocated block or `nil` if the block cannot be reallocated
-  ///   or the function is used to free the memory block
-  public static func realloc(_ ptr: UnsafeMutableRawPointer?, size: Int) -> UnsafeMutableRawPointer? {
-    av_realloc(ptr, size)
-  }
-
-  /// Free a memory block which has been allocated with a function of `malloc(size:)` or `realloc(_:size:)` family.
-  ///
-  /// - Note: `ptr = nil` is explicitly allowed.
-  /// - Note: It is recommended that you use `freep(_:)` instead, to prevent leaving behind dangling pointers.
-  ///
-  /// - Parameter ptr: Pointer to the memory block which should be freed.
-  public static func free(_ ptr: UnsafeMutableRawPointer?) {
-    av_free(ptr)
-  }
-
-  /// Free a memory block which has been allocated with a function of `malloc(size:)` or `realloc(_:size:)` family,
-  /// and set the pointer pointing to it to `nil`.
-  ///
-  /// - Note: `*ptr = NULL` is safe and leads to no action.
-  ///
-  /// - Parameter ptr: Pointer to the pointer to the memory block which should be freed
-  public static func freep(_ ptr: UnsafeMutableRawPointer?) {
-    av_freep(ptr)
-  }
-
-  /// Read the file with name, and put its content in a newly allocated buffer or map it with `mmap()` when available.
-  /// In case of success set `buffer` to the read or mmapped buffer, and `size` to the size in bytes of the buffer.
-  /// Unlike mmap this function succeeds with zero sized files, in this case `*bufptr` will be set to `nil`
-  /// and `*size` will be set to 0.
-  /// The returned buffer must be released with `fileUnmap(buffer:size:)`.
-  ///
-  /// - Throws: AVError
-  public static func fileMap(
-    filename: String,
-    buffer: UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>,
-    size: UnsafeMutablePointer<Int>
-  ) throws {
-    try throwIfFail(av_file_map(filename, buffer, size, 0, nil))
-  }
-
-  /// Unmap or free the buffer bufptr created by `fileMap(filename:buffer:size)`.
-  public static func fileUnmap(buffer: UnsafeMutablePointer<UInt8>, size: Int) {
-    av_file_unmap(buffer, size)
-  }
-}
-
-// MARK: - AVIODirEntry
-
-typealias CAVIODirEntry = CFFmpeg.AVIODirEntry
-
-/// Describes single entry of the directory.
-///
-/// Only name and type fields are guaranteed be set.
-/// Rest of fields are protocol or/and platform dependent and might be unknown.
-public final class AVIODirEntry {
-  var native: UnsafeMutablePointer<CAVIODirEntry>!
-
-  /// Filename.
-  public let name: String
-  /// Type of the entry
-  public let type: Kind
-  /// File size in bytes, -1 if unknown.
-  public let size: Int64
-  /// Time of last modification in microseconds since unix epoch, -1 if unknown.
-  public let modificationTimestamp: Int64
-  /// Time of last access in microseconds since unix epoch, -1 if unknown.
-  public let accessTimestamp: Int64
-  /// Time of last status change in microseconds since unix epoch, -1 if unknown.
-  public let statusChangeTimestamp: Int64
-  /// User ID of owner, -1 if unknown.
-  public let userId: Int64
-  /// Group ID of owner, -1 if unknown.
-  public let groupId: Int64
-  /// Unix file mode, -1 if unknown.
-  public let filemode: Int64
-
-  init(native: UnsafeMutablePointer<CAVIODirEntry>) {
-    self.native = native
-    self.name = String(cString: native.pointee.name)
-    self.type = Kind(rawValue: UInt32(native.pointee.type))!
-    self.size = native.pointee.size
-    self.modificationTimestamp = native.pointee.modification_timestamp
-    self.accessTimestamp = native.pointee.access_timestamp
-    self.statusChangeTimestamp = native.pointee.status_change_timestamp
-    self.userId = native.pointee.user_id
-    self.groupId = native.pointee.group_id
-    self.filemode = native.pointee.filemode
-  }
-
-  deinit {
-    avio_free_directory_entry(&native)
-  }
-}
-
-// MARK: - AVIODirEntry.Kind
-
-extension AVIODirEntry {
-
-  /// Directory entry types.
-  public enum Kind: UInt32 {
-    case unknown
-    case blockDevice
-    case characterDevice
-    case directory
-    case namedPipe
-    case symbolicLink
-    case socket
-    case file
-    case server
-    case share
-    case workgroup
-  }
-}
-
-extension AVIODirEntry.Kind: CustomStringConvertible {
-
-  public var description: String {
-    switch self {
-    case .blockDevice:
-      return "block device"
-    case .characterDevice:
-      return "character device"
-    case .directory:
-      return "directory"
-    case .namedPipe:
-      return "pipe"
-    case .symbolicLink:
-      return "symbolic link"
-    case .socket:
-      return "socket"
-    case .file:
-      return "file"
-    case .server:
-      return "server"
-    case .share:
-      return "share"
-    case .workgroup:
-      return "workgroup"
-    default:
-      return "unknown"
-    }
-  }
-}
-
-// MARK: - AVIODirContext
-
-typealias CAVIODirContext = CFFmpeg.AVIODirContext
-
-public final class AVIODirContext {
-  var native: UnsafeMutablePointer<CAVIODirContext>!
-  var isOpen = false
-
-  init(native: UnsafeMutablePointer<CAVIODirContext>) {
-    self.native = native
-  }
-
-  /// Open directory for reading.
-  ///
-  /// - Parameters:
-  ///   - url: directory to be listed.
-  ///   - options: A dictionary filled with protocol-private options.
-  /// - Throws: AVError
-  public init(url: String, options: [String: String]? = nil) throws {
-    var pm = options?.avDict
-    defer { av_dict_free(&pm) }
-
-    try throwIfFail(avio_open_dir(&native, url, &pm))
-    self.isOpen = true
-
-    dumpUnrecognizedOptions(pm)
-  }
-
-  /// Close directory.
-  public func close() {
-    if isOpen {
-      avio_close_dir(&native)
-      isOpen = false
-    }
-  }
-
-  deinit {
-    assert(!isOpen, "AVIODirContext must be close.")
-  }
-}
-
-extension AVIODirContext: Sequence {
-
-  public struct Iterator: IteratorProtocol {
-    let dirCtx: AVIODirContext
-    var nextEntry: UnsafeMutablePointer<CAVIODirEntry>?
-
-    init(dirCtx: AVIODirContext) {
-      self.dirCtx = dirCtx
-    }
-
-    public mutating func next() -> AVIODirEntry? {
-      if avio_read_dir(dirCtx.native, &nextEntry) >= 0, let ptr = nextEntry {
-        return AVIODirEntry(native: ptr)
-      }
-      return nil
-    }
-  }
-
-  public func makeIterator() -> Iterator {
-    Iterator(dirCtx: self)
-  }
-}
-
 /// Callback for checking whether to abort blocking functions.
 /// `AVError.exit` is returned in this case by the interrupted function.
 /// During blocking operations, callback is called with opaque as parameter.
@@ -260,7 +19,7 @@ typealias CAVIOContext = CFFmpeg.AVIOContext
 
 public typealias AVIOReadHandler = (UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt8>?, Int) ->
   Int
-public typealias AVIOWriteHandler = (UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt8>?, Int) ->
+public typealias AVIOWriteHandler = (UnsafeMutableRawPointer?, UnsafePointer<UInt8>?, Int) ->
   Int
 public typealias AVIOSeekHandler = (UnsafeMutableRawPointer?, Int64, Int) -> Int64
 
@@ -276,8 +35,8 @@ typealias IOBox = Box<IOBoxValue>
 public final class AVIOContext {
   var native: UnsafeMutablePointer<CAVIOContext>!
   var opaque: IOBox?
-  var owned = false
-  var isOpen = false
+  var owned: Bool = false
+  var isOpen: Bool = false
 
   init(native: UnsafeMutablePointer<CAVIOContext>) {
     self.native = native
@@ -317,7 +76,7 @@ public final class AVIOContext {
       }
     }
     var write:
-      (@convention(c) (UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt8>?, Int32) -> Int32)?
+      (@convention(c) (UnsafeMutableRawPointer?, UnsafePointer<UInt8>?, Int32) -> Int32)?
     if writeHandler != nil {
       write = { opaque, buffer, size -> Int32 in
         let value = Unmanaged<IOBox>.fromOpaque(opaque!).takeUnretainedValue().value
@@ -436,10 +195,10 @@ public final class AVIOContext {
 
   /// Force flushing of buffered data.
   ///
-  /// For write streams, force the buffered data to be immediately written to the output,
+  /// For write tracks, force the buffered data to be immediately written to the output,
   /// without to wait to fill the internal buffer.
   ///
-  /// For read streams, discard all currently buffered data, and advance the reported file
+  /// For read tracks, discard all currently buffered data, and advance the reported file
   /// position to that of the underlying stream. This does not read new data, and does not
   /// perform any seeks.
   public func flush() {
@@ -500,11 +259,11 @@ public final class AVIOContext {
   /// - Parameters:
   ///   - timestamp: timestamp in `AVStream.timebase` units or if there is no stream specified
   ///     then in `AVTimestamp.timebase` units.
-  ///   - streamIndex: The stream index that the timestamp is relative to.
-  ///     If `streamIndex` is -1 the timestamp should be in `AVTimestamp.timebase` units from
+  ///   - trackIndex: The stream index that the timestamp is relative to.
+  ///     If `trackIndex` is -1 the timestamp should be in `AVTimestamp.timebase` units from
   ///     the beginning of the presentation.
-  ///     If a `streamIndex` >= 0 is used and the protocol does not support seeking based on
-  ///     component streams, the call will fail.
+  ///     If a `trackIndex` >= 0 is used and the protocol does not support seeking based on
+  ///     component tracks, the call will fail.
   ///   - flags: Optional combination of `SeekFlag.backward`, `SeekFlag.byte` and `SeekFlag.any`.
   ///     The protocol may silently ignore `SeekFlag.backward` and `SeekFlag.any`, but `SeekFlag.byte`
   ///     will fail if used and not supported.
