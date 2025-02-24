@@ -6,7 +6,7 @@ A Swift wrapper for the FFmpeg API.
 
 ## FFmpeg Sources
 
-This fork relies on a multiplatform (iOS, macOS, & tvOS) prebuilt FFmpeg xcframework binary from the [FFmpegKit SPM repo](https://github.com/tylerjonesio/ffmpeg-kit-spm). The linked binaries do not include any GPL sources and are LGPL compatible. 
+This fork relies on a multiplatform (iOS, macOS, & tvOS) prebuilt FFmpeg xcframework binary from the [FFmpeg Libav SPM repo](https://github.com/tylerjonesio/ffmpeg-libav-spm). The linked binaries do not include any GPL sources and are LGPL compatible. 
 
 If you'd like to use your own FFmpeg binaries, check out the [upstream repository](https://github.com/sunlubo/SwiftFFmpeg) for instructions.
 
@@ -16,7 +16,7 @@ SwiftFFmpeg primarily uses [SwiftPM](https://swift.org/package-manager/) as its 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/tylerjonesio/SwiftFFmpeg.git", from: "5.1.2")
+    .package(url: "https://github.com/tylerjonesio/SwiftFFmpeg.git", from: "7.1.1")
 ]
 ```
 

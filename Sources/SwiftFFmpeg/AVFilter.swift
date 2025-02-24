@@ -446,8 +446,10 @@ extension AVFilterContext {
   }
 
   /// The channel layout of the audio buffer sink.
-  public var channelLayout: AVChannelLayout {
-    AVChannelLayout(rawValue: av_buffersink_get_channel_layout(native))
+  public var channelLayout: AVChannelLayout? {
+    var chl = AVChannelLayout()
+    let r = av_buffersink_get_ch_layout(native, &chl)
+    return r >= 0 ? chl : nil
   }
 
   /// Get a frame with filtered data from sink and put it in frame.
@@ -538,7 +540,7 @@ extension AVFilterLink {
 
   /// channel layout of current buffer
   public var channelLayout: AVChannelLayout {
-    AVChannelLayout(rawValue: native.pointee.channel_layout)
+    native.pointee.ch_layout
   }
 
   /// samples per second
@@ -553,7 +555,7 @@ typealias CAVFilterGraph = CFFmpeg.AVFilterGraph
 
 public final class AVFilterGraph {
   var native: UnsafeMutablePointer<CAVFilterGraph>!
-  var owned = false
+  var owned: Bool = false
 
   init(native: UnsafeMutablePointer<CAVFilterGraph>) {
     self.native = native
@@ -665,7 +667,7 @@ typealias CAVFilterInOut = CFFmpeg.AVFilterInOut
 /// filter context and the pad index required for establishing a link.
 public final class AVFilterInOut {
   var native: UnsafeMutablePointer<CAVFilterInOut>!
-  var owned = false
+  var owned: Bool = false
 
   init(native: UnsafeMutablePointer<CAVFilterInOut>) {
     self.native = native

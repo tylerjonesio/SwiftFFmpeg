@@ -27,6 +27,7 @@ typealias CAVCodecContext = CFFmpeg.AVCodecContext
 
 public final class AVCodecContext {
   var native: UnsafeMutablePointer<CAVCodecContext>!
+  var owned: Bool = false
   var opaqueBox: CodecContextBox? {
     didSet {
       if let box = opaqueBox {
@@ -36,7 +37,6 @@ public final class AVCodecContext {
       }
     }
   }
-  var owned = false
 
   init(native: UnsafeMutablePointer<CAVCodecContext>) {
     self.native = native
@@ -179,12 +179,12 @@ public final class AVCodecContext {
     set { native.pointee.time_base = newValue }
   }
 
-  /// Frame counter.
+  /// Frame counter, set by libavcodec.
   ///
   /// - encoding: Total number of frames passed to the encoder so far.
   /// - decoding: Total number of frames returned from the decoder so far.
   public var frameNumber: Int {
-    Int(native.pointee.frame_number)
+    Int(native.pointee.frame_num)
   }
 
   /// A reference to the `AVHWFramesContext` describing the input (for encoding)
@@ -369,8 +369,6 @@ extension AVCodecContext {
     public static let gray = Flag(rawValue: UInt32(AV_CODEC_FLAG_GRAY))
     /// error[?] variables will be set during encoding.
     public static let psnr = Flag(rawValue: UInt32(AV_CODEC_FLAG_PSNR))
-    /// Input bitstream might be truncated at a random location instead of only at frame boundaries.
-    public static let truncated = Flag(rawValue: UInt32(AV_CODEC_FLAG_TRUNCATED))
     /// Use interlaced DCT.
     public static let interlacedDCT = Flag(rawValue: UInt32(AV_CODEC_FLAG_INTERLACED_DCT))
     /// Force low delay.
@@ -404,7 +402,6 @@ extension AVCodecContext.Flag: CustomStringConvertible {
     if contains(.loopFilter) { str += "loopFilter, " }
     if contains(.gray) { str += "gray, " }
     if contains(.psnr) { str += "psnr, " }
-    if contains(.truncated) { str += "truncated, " }
     if contains(.interlacedDCT) { str += "interlacedDCT, " }
     if contains(.lowDelay) { str += "lowDelay, " }
     if contains(.globalHeader) { str += "globalHeader, " }
@@ -634,12 +631,6 @@ extension AVCodecContext {
     set { native.pointee.sample_rate = Int32(newValue) }
   }
 
-  /// Number of audio channels.
-  public var channelCount: Int {
-    get { Int(native.pointee.channels) }
-    set { native.pointee.channels = Int32(newValue) }
-  }
-
   /// Audio sample format.
   ///
   /// - encoding: Set by user.
@@ -660,8 +651,8 @@ extension AVCodecContext {
   /// - encoding: Set by user.
   /// - decoding: Set by user, may be overwritten by codec.
   public var channelLayout: AVChannelLayout {
-    get { AVChannelLayout(rawValue: native.pointee.channel_layout) }
-    set { native.pointee.channel_layout = newValue.rawValue }
+    get { native.pointee.ch_layout }
+    set { native.pointee.ch_layout = newValue }
   }
 }
 
