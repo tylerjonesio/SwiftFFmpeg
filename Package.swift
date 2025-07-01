@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
   name: "SwiftFFmpeg",
-  platforms: [.macOS(.v10_15), .iOS(.v12), .tvOS(.v12)],
+  platforms: [.macOS(.v12), .iOS(.v15), .tvOS(.v15)],
   products: [
     .library(
       name: "SwiftFFmpeg",
@@ -14,7 +14,7 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/tylerjonesio/ffmpeg-libav-spm", branch: "min.v7.1.2")
+    .package(url: "https://github.com/tylerjonesio/ffmpeg-libav-spm", branch: "min.v7.1.1.1")
   ],
   targets: [
     .target(
