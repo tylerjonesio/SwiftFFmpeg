@@ -9,6 +9,10 @@ import CFFmpeg
 
 typealias CAVMediaCodecContext = CFFmpeg.AVMediaCodecContext
 
+@available(iOS, unavailable)
+@available(macOS, unavailable)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
 public final class AVMediaCodecContext {
     var native: UnsafeMutablePointer<CAVMediaCodecContext>!
     var codecContext: AVCodecContext
