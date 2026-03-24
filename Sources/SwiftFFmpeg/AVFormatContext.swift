@@ -37,7 +37,7 @@ public final class AVFormatContext {
     defer { av_dict_free(&pm) }
 
     try throwIfFail(avformat_open_input(&native, url, format?.native, &pm))
-
+      
     dumpUnrecognizedOptions(pm)
   }
 

@@ -7,6 +7,9 @@
 
 import Foundation
 import SwiftFFmpeg
+#if canImport(Android)
+import Android
+#endif
 
 private func openCodecContext(fmtCtx: AVFormatContext, mediaType: AVMediaType) throws -> (
   AVCodecContext, Int
@@ -30,7 +33,7 @@ private func decode_video_packet(
   pkt: AVPacket?,
   frame: AVFrame,
   image: AVImage,
-  file: UnsafeMutablePointer<FILE>
+  file: CFilePointer
 ) throws {
   try codecCtx.sendPacket(pkt)
 
@@ -58,7 +61,7 @@ private func decode_video_packet(
     // this is required since rawvideo expects non aligned data
     image.copy(from: frame)
     // write to rawvideo file
-    fwrite(image.data[0], 1, image.size, file)
+    fwrite(image.data[0]!, 1, image.size, file)
 
     frame.unref()
   }
@@ -68,7 +71,7 @@ private func decode_audio_packet(
   codecCtx: AVCodecContext,
   pkt: AVPacket?,
   frame: AVFrame,
-  file: UnsafeMutablePointer<FILE>
+  file: CFilePointer
 ) throws {
   try codecCtx.sendPacket(pkt)
 
@@ -88,7 +91,7 @@ private func decode_audio_packet(
     // You should use libswresample or libavfilter to convert the frame
     // to packed data.
     let unpaddedLinesize = frame.sampleCount * frame.sampleFormat.bytesPerSample
-    fwrite(frame.extendedData[0], 1, unpaddedLinesize, file)
+    fwrite(frame.extendedData[0]!, 1, unpaddedLinesize, file)
 
     print("audio frame: \(codecCtx.frameNumber)")
 

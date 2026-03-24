@@ -9,15 +9,23 @@ import SwiftFFmpeg
 
 #if canImport(Darwin)
 import Darwin
-#else
+#elseif canImport(Glibc)
 import Glibc
+#elseif canImport(Android)
+import Android
+#endif
+
+#if canImport(Android)
+typealias CFilePointer = OpaquePointer
+#else
+typealias CFilePointer = UnsafeMutablePointer<FILE>
 #endif
 
 private func decode(
   codecCtx: AVCodecContext,
   frame: AVFrame,
   pkt: AVPacket?,
-  file: UnsafeMutablePointer<FILE>
+  file: CFilePointer
 ) throws {
   try codecCtx.sendPacket(pkt)
 

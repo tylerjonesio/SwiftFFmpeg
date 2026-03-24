@@ -9,15 +9,17 @@ import SwiftFFmpeg
 
 #if canImport(Darwin)
 import Darwin
-#else
+#elseif canImport(Glibc)
 import Glibc
+#elseif canImport(Android)
+import Android
 #endif
 
 private func decode_write(
   codecCtx: AVCodecContext,
   pkt: AVPacket?,
   hwPixFmt: AVPixelFormat,
-  file: UnsafeMutablePointer<FILE>
+  file: CFilePointer
 ) throws {
   try codecCtx.sendPacket(pkt)
 
@@ -42,7 +44,7 @@ private func decode_write(
 
     let buffer = try AVImage.makePixelBuffer(from: tmpFrame)
     defer { buffer.deallocate() }
-    fwrite(buffer.baseAddress, 1, buffer.count, file)
+    fwrite(buffer.baseAddress!, 1, buffer.count, file)
 
     frame.unref()
   }

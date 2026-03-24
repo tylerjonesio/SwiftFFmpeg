@@ -82,7 +82,7 @@ func scaling_video() throws {
     try srcImage.reformat(using: swsCtx, to: dstImage)
 
     // write scaled image to file
-    fwrite(dstImage.data[0], 1, dstImage.size, file)
+    fwrite(dstImage.data[0]!, 1, dstImage.size, file)
   }
 
   print("Scaling succeeded. Play the output file with the command:")

@@ -9,8 +9,10 @@ import CFFmpeg
 
 #if canImport(Darwin)
 import Darwin
-#else
+#elseif canImport(Glibc)
 import Glibc
+#elseif canImport(Android)
+import Android
 #endif
 
 public struct AVError: Error, Equatable {

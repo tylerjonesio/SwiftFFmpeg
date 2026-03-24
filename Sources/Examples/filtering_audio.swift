@@ -9,11 +9,13 @@ import SwiftFFmpeg
 
 #if canImport(Darwin)
 import Darwin
-#else
+#elseif canImport(Glibc)
 import Glibc
+#elseif canImport(Android)
+import Android
 #endif
 
-private func print_frame(frame: AVFrame, file: UnsafeMutablePointer<FILE>) throws {
+private func print_frame(frame: AVFrame, file: CFilePointer) throws {
   let n = frame.sampleCount * frame.channelLayout.channelCount
   let data = UnsafeRawPointer(frame.data[0]!).bindMemory(to: UInt16.self, capacity: n)
   for i in 0 ..< n {

@@ -9,8 +9,10 @@ import SwiftFFmpeg
 
 #if canImport(Darwin)
 import Darwin
-#else
+#elseif canImport(Glibc)
 import Glibc
+#elseif canImport(Android)
+import Android
 #endif
 
 private func saveToPGM(
@@ -20,7 +22,7 @@ private func saveToPGM(
   _ ysize: Int,
   _ filename: String
 ) {
-  let file = fopen(filename, "w")
+  let file = fopen(filename, "w")!
   defer { fclose(file) }
 
   let header = String(format: "P5\n%d %d\n%d\n", xsize, ysize, 255)

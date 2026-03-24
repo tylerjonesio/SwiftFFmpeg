@@ -9,15 +9,17 @@ import SwiftFFmpeg
 
 #if canImport(Darwin)
 import Darwin
-#else
+#elseif canImport(Glibc)
 import Glibc
+#elseif canImport(Android)
+import Android
 #endif
 
 private func encode(
   codecCtx: AVCodecContext,
   frame: AVFrame?,
   pkt: AVPacket,
-  file: UnsafeMutablePointer<FILE>
+  file: CFilePointer
 ) throws {
   if let frame = frame {
     print(String(format: "Send frame %3d", frame.pts))
@@ -35,7 +37,7 @@ private func encode(
 
     print(String(format: "Write packet %3d (size=%5d)", pkt.pts, pkt.size))
 
-    fwrite(pkt.data, 1, pkt.size, file)
+    fwrite(pkt.data!, 1, pkt.size, file)
 
     pkt.unref()
   }

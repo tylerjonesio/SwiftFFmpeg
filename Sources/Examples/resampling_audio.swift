@@ -9,8 +9,10 @@ import SwiftFFmpeg
 
 #if canImport(Darwin)
 import Darwin
-#else
+#elseif canImport(Glibc)
 import Glibc
+#elseif canImport(Android)
+import Android
 #endif
 
 private func fill_samples(_ samples: AVSamples, _ sampleRate: Int64, _ t: Double) -> Double {
@@ -114,7 +116,7 @@ func resampling_audio() throws {
     let (size, _) = try AVSamples.getBufferSize(
       channelCount: dstChannelCount, sampleCount: sampleCount, sampleFormat: dstSampleFmt, align: 1
     )
-    fwrite(dstSamples.data[0], 1, size, file)
+    fwrite(dstSamples.data[0]!, 1, size, file)
 
     print("t:\(t) in:\(srcSampleCount) out:\(sampleCount)")
   } while t < 10

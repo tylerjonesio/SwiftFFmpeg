@@ -7,6 +7,9 @@
 
 import CFFmpeg
 import Foundation
+#if os(Android)
+import Android
+#endif
 
 // MARK: - AVLog
 
@@ -40,7 +43,10 @@ public enum AVLog {
     
   public static func setLogger(completion: @escaping Callback) {
     callback = completion
-    av_log_set_callback(avLog(_:_:_:_:))
+    // This is causing a compiler crash currently (3/20/26)
+    #if !os(Android)
+      av_log_set_callback(avLog(_:_:_:_:))
+    #endif
   }
 }
 
@@ -79,7 +85,9 @@ extension AVLog {
 }
 
 private var callback: AVLog.Callback?
+private var currentLevel: Int32 = 16
 private func avLog(_ item: UnsafeMutableRawPointer?, _ level: Int32, _ message: UnsafePointer<CChar>?, _ listPointer: CVaListPointer?) {
+    guard level <= currentLevel else { return }
     let level = AVLog.Level(rawValue: level)
     
     let stringMessage = message.flatMap { String(cString: $0) }
