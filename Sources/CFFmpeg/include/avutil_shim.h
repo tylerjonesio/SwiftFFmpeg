@@ -10,6 +10,7 @@
 #include <libavutil/opt.h>
 #include <libavutil/file.h>
 #include <libavutil/log.h>
+#include <libavutil/time.h>
 #include <libavutil/timestamp.h>
 #include <libavutil/pixdesc.h>
 #include <libavutil/imgutils.h>
