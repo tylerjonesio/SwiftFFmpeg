@@ -97,6 +97,34 @@ extension AVCodecID {
   public static let APE = AV_CODEC_ID_APE
   public static let MP1 = AV_CODEC_ID_MP1
 
+  // MARK: - Subtitle Codecs
+
+  public static let HDMV_PGS_SUBTITLE = AV_CODEC_ID_HDMV_PGS_SUBTITLE
+  public static let DVB_TELETEXT = AV_CODEC_ID_DVB_TELETEXT
+  public static let SRT = AV_CODEC_ID_SRT
+  public static let MICRODVD = AV_CODEC_ID_MICRODVD
+  public static let DST = AV_CODEC_ID_DST
+  public static let FIRST_SUBTITLE = AV_CODEC_ID_FIRST_SUBTITLE
+  public static let DVD_SUBTITLE = AV_CODEC_ID_DVD_SUBTITLE
+  public static let DVB_SUBTITLE = AV_CODEC_ID_DVB_SUBTITLE
+  public static let TEXT = AV_CODEC_ID_TEXT
+  public static let XSUB = AV_CODEC_ID_XSUB
+  public static let SSA = AV_CODEC_ID_SSA
+  public static let MOV_TEXT = AV_CODEC_ID_MOV_TEXT
+  public static let EIA_608 = AV_CODEC_ID_EIA_608
+  public static let JACOSUB = AV_CODEC_ID_JACOSUB
+  public static let SAMI = AV_CODEC_ID_SAMI
+  public static let REALTEXT = AV_CODEC_ID_REALTEXT
+  public static let STL = AV_CODEC_ID_STL
+  public static let SUBVIEWER1 = AV_CODEC_ID_SUBVIEWER1
+  public static let SUBVIEWER = AV_CODEC_ID_SUBVIEWER
+  public static let SUBRIP = AV_CODEC_ID_SUBRIP
+  public static let WEBVTT = AV_CODEC_ID_WEBVTT
+  public static let MPL2 = AV_CODEC_ID_MPL2
+  public static let VPLAYER = AV_CODEC_ID_VPLAYER
+  public static let PJS = AV_CODEC_ID_PJS
+  public static let ASS = AV_CODEC_ID_ASS
+  public static let HDMV_TEXT_SUBTITLE = AV_CODEC_ID_HDMV_TEXT_SUBTITLE
   /// The name of the codec.
   public var name: String {
     String(cString: avcodec_get_name(self))
@@ -327,16 +355,6 @@ extension AVCodec {
     /// Codec can be fed a final frame with a smaller size.
     /// This can be used to prevent truncation of the last audio samples.
     public static let smallLastFrame = Cap(rawValue: UInt32(AV_CODEC_CAP_SMALL_LAST_FRAME))
-    /// Codec can output multiple frames per `AVPacket`.
-    /// Normally demuxers return one frame at a time, demuxers which do not do
-    /// are connected to a parser to split what they return into proper frames.
-    /// This flag is reserved to the very rare category of codecs which have a
-    /// bitstream that cannot be split into frames without timeconsuming
-    /// operations like full decoding. Demuxers carrying such bitstreams thus
-    /// may return multiple frames in a packet. This has many disadvantages like
-    /// prohibiting stream copy in many cases thus it should only be considered
-    /// as a last resort.
-    public static let subframes = Cap(rawValue: UInt32(AV_CODEC_CAP_SUBFRAMES))
     /// Codec is experimental and is thus avoided in favor of non experimental encoders.
     public static let experimental = Cap(rawValue: UInt32(AV_CODEC_CAP_EXPERIMENTAL))
     /// Codec should fill in channel configuration and samplerate instead of container.
@@ -382,7 +400,6 @@ extension AVCodec.Cap: CustomStringConvertible {
     if contains(.dr1) { str += "dr1, " }
     if contains(.delay) { str += "delay, " }
     if contains(.smallLastFrame) { str += "smallLastFrame, " }
-    if contains(.subframes) { str += "subframes, " }
     if contains(.experimental) { str += "experimental, " }
     if contains(.channelConf) { str += "channelConf, " }
     if contains(.frameThreads) { str += "frameThreads, " }

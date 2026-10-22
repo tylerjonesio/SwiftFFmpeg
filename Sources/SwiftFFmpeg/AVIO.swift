@@ -184,7 +184,7 @@ public final class AVIOContext {
   /// - Throws: AVError
   public func size() throws -> Int64 {
     let ret = avio_size(native)
-    try throwIfFail(Int32(ret))
+    try throwIfFail(Int32(clamping: ret))
     return ret
   }
 

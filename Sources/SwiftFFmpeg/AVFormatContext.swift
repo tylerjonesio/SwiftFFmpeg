@@ -252,8 +252,6 @@ extension AVFormatContext {
     public static let sortDTS = Flag(rawValue: AVFMT_FLAG_SORT_DTS)
     /// Enable fast, but inaccurate seeks for some formats.
     public static let fastSeek = Flag(rawValue: AVFMT_FLAG_FAST_SEEK)
-    /// Stop muxing when the shortest stream stops.
-    public static let shortest = Flag(rawValue: AVFMT_FLAG_SHORTEST)
     /// Add bitstream filters as requested by the muxer.
     public static let autoBSF = Flag(rawValue: AVFMT_FLAG_AUTO_BSF)
 
@@ -279,7 +277,6 @@ extension AVFormatContext.Flag: CustomStringConvertible {
     if contains(.bitexact) { str += "bitexact, " }
     if contains(.sortDTS) { str += "sortDTS, " }
     if contains(.fastSeek) { str += "fastSeek, " }
-    if contains(.shortest) { str += "shortest, " }
     if contains(.autoBSF) { str += "autoBSF, " }
     if str.suffix(2) == ", " {
       str.removeLast(2)
