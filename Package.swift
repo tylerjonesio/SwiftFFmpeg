@@ -14,7 +14,7 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/tylerjonesio/ffmpeg-libav-spm", branch: "min.v7.1.3.0")
+    .package(url: "https://github.com/tylerjonesio/ffmpeg-libav-spm", branch: "min.v9.0.2.0")
   ],
   targets: [
     .target(
