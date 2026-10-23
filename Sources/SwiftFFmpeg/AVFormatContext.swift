@@ -15,6 +15,11 @@ typealias CAVFormatContext = CFFmpeg.AVFormatContext
 public final class AVFormatContext {
   var native: UnsafeMutablePointer<CAVFormatContext>!
   var ioContext: AVIOContext?
+  private var ioOpenOptionsContext: AVFormatIOOpenOptionsContext?
+
+  /// Transform options before each native I/O open, including HLS child requests.
+  /// The handler may be called from FFmpeg worker threads.
+  public typealias IOOpenOptions = @Sendable (String, AVIOContext.Flag, [String: String]) -> [String: String]
 
   /// Create an `AVFormatContext`.
   public init() {
@@ -27,18 +32,16 @@ public final class AVFormatContext {
   ///   - url: URL of the stream to open.
   ///   - format: If non-nil, this parameter forces a specific input format. Otherwise the format is autodetected.
   ///   - options: A dictionary filled with `AVFormatContext` and demuxer-private options.
+  ///   - ioOpenOptions: An optional per-open options handler, installed before opening the input.
   /// - Throws: AVError
-  public init(
+  public convenience init(
     url: String,
     format: AVInputFormat? = nil,
-    options: [String: String]? = nil
+    options: [String: String]? = nil,
+    ioOpenOptions: IOOpenOptions? = nil
   ) throws {
-    var pm: OpaquePointer? = options?.avDict
-    defer { av_dict_free(&pm) }
-
-    try throwIfFail(avformat_open_input(&native, url, format?.native, &pm))
-      
-    dumpUnrecognizedOptions(pm)
+    self.init()
+    try openInput(url, format: format, options: options, ioOpenOptions: ioOpenOptions)
   }
 
   /// Allocate an `AVFormatContext` for an output format.
@@ -321,12 +324,22 @@ extension AVFormatContext {
   ///   - url: URL of the stream to open.
   ///   - format: If non-nil, this parameter forces a specific input format. Otherwise the format is autodetected.
   ///   - options: A dictionary filled with `AVFormatContext` and demuxer-private options.
+  ///   - ioOpenOptions: An optional per-open options handler, installed before opening the input.
   /// - Throws: AVError
   public func openInput(
     _ url: String? = nil,
     format: AVInputFormat? = nil,
-    options: [String: String]? = nil
+    options: [String: String]? = nil,
+    ioOpenOptions: IOOpenOptions? = nil
   ) throws {
+    guard native != nil else { throw AVError.outOfMemory }
+    if let ioOpenOptions {
+      let originalOpen = ioOpenOptionsContext?.originalOpen ?? native.pointee.io_open
+      let context = AVFormatIOOpenOptionsContext(handler: ioOpenOptions, originalOpen: originalOpen)
+      ioOpenOptionsContext = context
+      native.pointee.opaque = Unmanaged.passUnretained(context).toOpaque()
+      native.pointee.io_open = avFormatIOOpenWithOptions
+    }
     var pm: OpaquePointer? = options?.avDict
     defer { av_dict_free(&pm) }
 

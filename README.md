@@ -39,3 +39,29 @@ For specific examples such as decoding, encoding, scaling, etc, check out the [S
 * [Scaling Video](Sources/SwiftFFmpegExamples/scaling_video.swift)
 * [Filtering Video](Sources/SwiftFFmpegExamples/filtering_video.swift)
 * [Filtering Audio](Sources/SwiftFFmpegExamples/filtering_audio.swift)
+
+## Options for nested I/O opens
+
+`AVFormatContext(url:options:ioOpenOptions:)` and
+`openInput(_:format:options:ioOpenOptions:)` accept a per-context options handler.
+It runs before the initial input and subsequent native I/O opens, including HLS
+playlists, segments, and encryption keys. Return the supplied dictionary with
+any desired additions; this preserves request-specific options such as cookies,
+headers, and byte ranges.
+
+```swift
+let tlsOptions = ["ca_file": caBundleURL.path, "tls_verify": "1"]
+let context = try AVFormatContext(url: streamURL, options: tlsOptions,
+                                 ioOpenOptions: { _, _, options in
+  options.merging(tlsOptions) { _, configured in configured }
+})
+```
+
+The hook delegates to FFmpeg's original `io_open`, retaining its interruption,
+protocol restriction, and I/O close behavior. Its state lives until the format
+context closes, including when an open fails. Handlers must be thread-safe and
+should not capture the owning format context strongly. Installing the handler
+reserves the native `AVFormatContext.opaque` field; do not overwrite it through
+unsafe pointer access. Nested contexts share this field under FFmpeg's callback
+contract. Configure the handler before opening, and do not mutate native callback
+fields while the context is in use.
